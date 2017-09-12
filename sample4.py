@@ -55,13 +55,16 @@ def render(image, center_x, center_y):
                 ys.append(min(l[1], l[3]))
 
     if len(filtered_lines) > 7:
-        # print("We're passing")
         ys.sort(key=int)
         # print(ys)
         y_delta = abs(ys[0] - ys[-1])
         # print(y_delta)
         if(y_delta < 70):
             return True
+        elif len(filtered_lines) > 15:
+            # print("Double Jepordy for Large Matches")
+            if(y_delta < 160):
+                return True
 
     # print("Number of lines: {:d}".format(len(filtered_lines)))
     # drawn_img = lsd.drawSegments(gray,np.array(filtered_lines))
@@ -84,7 +87,6 @@ def process_video(file_name):
 
     cap = cv2.VideoCapture(file_name)
     print("Reading file {:s}".format(file_name))
-    passes = False
     while(cap.isOpened()):
         ret, frame = cap.read()
         if not ret:
@@ -100,7 +102,6 @@ for file in os.listdir("zebra"):
     if file.endswith(".avi"):
         files.append(os.path.join("zebra", file))
 
-# files = ["zebra/akn.088.141.left.avi"]
 for file_name in files:
     file_name, passes = process_video(file_name)
     print("{:s} has {:s}".format(file_name, "zibra" if passes else "no zibra" ))
