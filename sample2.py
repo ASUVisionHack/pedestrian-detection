@@ -19,7 +19,7 @@ def render(image):
     cv2.waitKey(0)
 
     ret,thresh = cv2.threshold(subframe,127,255,0)
-    im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
         epsilon = .02 * cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, epsilon, True)
