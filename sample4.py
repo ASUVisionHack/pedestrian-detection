@@ -76,14 +76,7 @@ def file_get_contents(filename):
     with open(filename) as f:
         return f.read()
 
-files = []
-for file in os.listdir("zebra"):
-    if file.endswith(".avi"):
-        files.append(os.path.join("zebra", file))
-
-# files = ["zebra/akn.088.141.left.avi"]
-index = 0
-for file_name in files:
+def process_video(file_name):
     text_file = "{:s}.txt".format(file_name[:-9])
     center_x, center_y = file_get_contents(text_file).split(" ")
     center_x = int(center_x)
@@ -91,18 +84,25 @@ for file_name in files:
 
     cap = cv2.VideoCapture(file_name)
     print("Reading file {:s}".format(file_name))
+    passes = False
     while(cap.isOpened()):
         ret, frame = cap.read()
         if not ret:
             break
 
-        index += 1
-        # if index != 24: continue
-        # if index != 628: continue
-        # print("Index Number: {:d}".format(index))
         if render(frame, center_x, center_y):
-            print("TRUE")
-            break
+            return (file_name, True)
     cap.release()
+    return (file_name, False)
+
+files = []
+for file in os.listdir("zebra"):
+    if file.endswith(".avi"):
+        files.append(os.path.join("zebra", file))
+
+# files = ["zebra/akn.088.141.left.avi"]
+for file_name in files:
+    file_name, passes = process_video(file_name)
+    print("{:s} has {:s}".format(file_name, "zibra" if passes else "no zibra" ))
 
 cv2.destroyAllWindows()
