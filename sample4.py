@@ -3,9 +3,11 @@ import cv2
 import imutils
 from matplotlib import pyplot as plt
 
+isPassing = False
+
 def render(image):
-    center_x = 946 * .6
-    center_y = 540 * .6
+    center_x = 909 * .6
+    center_y = 751 * .6
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray = cv2.resize(gray, (0, 0), fx=0.6, fy=0.6)
@@ -40,17 +42,22 @@ def render(image):
         dx = l[0] - l[2] if l[1] < l[3] else l[2] - l[0]
         dy = abs(l[3] - l[1])
 
-        if dy > 20:
+        if dy > 40:
             slope = dx / dy
-            print("x: {:f},  y: {:f}, slope: {:f}".format(dx, dy, slope))
-            filtered_lines.append(line)
-            # if isCentered(slope, l):
-                # filtered_lines.append(line)
+            # print("x: {:f},  y: {:f}, slope: {:f}".format(dx, dy, slope))
+            # filtered_lines.append(line)
+            if isCentered(slope, l):
+                filtered_lines.append(line)
 
         # if y_d < x_d and y_d < 10 and x_d > 20 and x_d < 60:
         #     print("{:f} - {:f}".format(x_d, y_d))
         #     filtered_lines.append(line)
 
+    if len(filtered_lines) > 4:
+        isPassing = True
+        print("We're passing")
+
+    print("Number of lines: {:d}".format(len(filtered_lines)))
     drawn_img = lsd.drawSegments(gray,np.array(filtered_lines))
     # cv2.circle(drawn_img,(int(center_x),int(center_y)), 20, (0,0,255), -1)
 
@@ -58,11 +65,12 @@ def render(image):
     cv2.waitKey(0)
 
 cap = cv2.VideoCapture('zebra/akn.031.037.left.avi')
-while(cap.isOpened()):
+while(cap.isOpened() and isPassing is False):
+    print("Continue {:b}".format(isPassing))
     ret, frame = cap.read()
     render(frame)
 cap.release()
 
-# image = cv2.imread('sample-img-1.png')
+# image = cv2.imread('sample-img-2.png')
 # render(image)
 cv2.destroyAllWindows()
