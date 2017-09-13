@@ -94,7 +94,6 @@ def process_video(file_name):
 
         if render(frame, center_x, center_y):
             return (file_name, True)
-    cap.release()
     return (file_name, False)
 
 files = []
