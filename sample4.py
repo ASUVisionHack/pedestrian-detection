@@ -27,11 +27,11 @@ def render(image, center_x, center_y):
         width = abs(l[2] - l[0])
         dx = (center_x - l[0])
         dy = abs(center_y - l[1])
-        slope =  dx / dy
 
         if not dy > 0:
             return False
 
+        slope =  dx / dy
         if height < 20 or height > 50 or width > 100:
             return False
 
