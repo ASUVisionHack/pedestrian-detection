@@ -208,9 +208,14 @@ data_info = {
     "akn.431.139.left.avi": [0, 0, 1, 0, 0, 0],
 }
 
+def drawRectangle(image, x, y, w, h, color=(0, 0, 255)):
+    br = x + w, y + h
+    tl = x, y
+    cv2.rectangle(image, br, tl, color)
+
 def process_frame(frame):
     # resize the frame to fit my screen better
-    frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    ogFrame = frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
     # frame = cv2.GaussianBlur(frame, (5, 5), 0)
 
     # now we can see the light
@@ -252,9 +257,7 @@ def process_frame(frame):
         frame = cv2.drawContours(frame, [approx], -1, (255, 0, 255))
         drawRectangle(frame, x, y, w, h)
         drawRectangle(frame, x - 10, y - 10, w + 20, h + 20, (0, 255, 0))
-        shitlist.append((x, y, w, h))
-        cv2.imshow('out', frame)
-        cv2.waitKey(0)
+        shitlist.append((ogFrame, x, y, w, h))
 
     return shitlist
 
@@ -262,11 +265,18 @@ def render(frame, center_x, center_y):
     squareList = process_frame(frame)
     if squareList:
         for item in squareList:
-            x, y, w, h = item
+            frame, x, y, w, h = item
 
-            img1 = frame[x:x+h, y:y+w]
+            img1 = frame[y-10:y+h+20, x-10:x+w+20]
             img2 = cv2.imread('speedbump.png')
 
+            height1, width1 = img1.shape[:2]
+            height, width = img2.shape[:2]
+
+            if height1 <= 0 or width1 <= 0:
+                return False
+
+            img1 = cv2.resize(img1, (height, width))
             sift = cv2.ORB_create()
 
             kp1, des1 = sift.detectAndCompute(img1,None)
@@ -281,13 +291,14 @@ def render(frame, center_x, center_y):
             # Sort them in the order of their distance.
             matches = sorted(matches, key = lambda x:x.distance)
 
-            # Draw first 10 matches.
-            img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:10], None, flags=2)
+            # if len(matches) == 13:
+                # Draw first 10 matches.
+            img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:20], None, flags=2)
             cv2.imshow('out', img1)
-            # plt.imshow(img3),plt.show()
+            plt.imshow(img3),plt.show()
 
             # Draw focal point
-            cv2.waitKey(1)
+            # cv2.waitKey(0)
 
     return False
 
@@ -310,7 +321,7 @@ def process_video(file_name):
         if not ret:
             break
 
-        if index != 105: continue
+        if index != 106: continue
         print("FRAME NUMBER {:d}".format(index))
         if render(frame, center_x, center_y):
             print("MATCH ON FRAME {:d}".format(index))

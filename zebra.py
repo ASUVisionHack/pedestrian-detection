@@ -263,6 +263,9 @@ def render(image, center_x, center_y):
                 ys.append(min(l[1], l[3]))
                 xs.append(min(l[0], l[2]))
 
+    drawn_img = lsd.drawSegments(gray,np.array(filtered_lines))
+    cv2.imshow("Image", drawn_img)
+    cv2.waitKey(0)
     if len(filtered_lines) > 7:
         ys.sort(key=int)
         xs.sort(key=int)
@@ -292,13 +295,11 @@ def render(image, center_x, center_y):
                 return False
 
             # print("Number of lines: {:d}".format(len(filtered_lines)))
-            # drawn_img = lsd.drawSegments(gray,np.array(filtered_lines))
 
             # Draw focal point
             # cv2.circle(drawn_img,(int(center_x),int(center_y)), 20, (0,0,255), -1)
-            # cv2.imshow("Image", drawn_img)
-            # cv2.waitKey(0)
-            return True
+
+            # return True
 
 
 def file_get_contents(filename):
@@ -331,7 +332,7 @@ for fileObj in os.listdir("validationset"):
     if fileObj.endswith(".avi"):
         files.append(os.path.join("validationset", fileObj))
 
-files = ["validationset/akn.240.107.left.avi"]
+# files = ["validationset/akn.240.107.left.avi"]
 for file_name in files:
     key = os.path.basename(file_name)
     if data_info[key][5] == 1:
